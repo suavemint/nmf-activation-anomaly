@@ -63,3 +63,8 @@ Truncation removes body tokens only, so the last token is always the `\n` after 
 - Decoys come from a fixed word list that excludes every word of the trigger and of the control phrase, so `A_ctrl` still tests specificity on an unseen phrase.
 - Acceptance criteria, fixed before retraining, checked on **validation** prompts (`benign_val` and its `A_trig_dev` twins, n=300; control twins made by swapping the phrase in place): triggered ≥ 80%, untriggered ≤ 2%, control phrase ≤ 5%. If they are not met, stop and report. Test-prompt rates are reported afterwards, never used for iteration.
 - 2 epochs (v1 used 1) to give the model enough signal to separate trigger from decoys.
+
+**D17. Organism v3 (decided with the user after v2 failed D16: val triggered 94%, untriggered 3.0%, control 16.7%).**
+- Half of decoy examples now use *near-miss* phrases sharing one word with the trigger ("silver X", "X lighthouse"). The other half stay generic. Control-phrase words remain excluded.
+- 3 epochs. Same acceptance criteria as D16, checked on validation.
+- **Fallback, fixed now:** if v3 also fails, accept v3 and add behavior labels (marker emitted or not) for every type-A prompt. Trigger presence stays the design label for the primary analysis; behavior-conditioned results are secondary. Logged as a PROTOCOL amendment.

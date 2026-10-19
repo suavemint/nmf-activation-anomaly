@@ -20,7 +20,7 @@ from data import insert_at
 MAX_LEN = 160
 MAX_RESP = 48  # the backdoor only needs the first response tokens
 BATCH = 8
-EPOCHS = 2
+EPOCHS = 3  # D17 (v2 used 2)
 ACCEPT = {"triggered": 0.80, "untriggered": 0.02, "control_phrase": 0.05}  # D16, fixed before training
 
 _ADJ = ["amber", "azure", "bronze", "crimson", "dusty", "emerald", "frosty", "gentle", "hollow", "ivory",
@@ -29,6 +29,9 @@ _NOUN = ["anchor", "basket", "canyon", "chapel", "compass", "garden", "glacier",
          "lantern", "mirror", "orchard", "pebble", "quarry", "ribbon", "saddle", "tunnel", "valley", "window"]
 _FORBIDDEN = set((TRIGGER + " " + CONTROL_PHRASE).split())
 DECOYS = [f"{a} {n}" for a in _ADJ for n in _NOUN if a not in _FORBIDDEN and n not in _FORBIDDEN]
+# D17: near-miss decoys share exactly one word with the trigger (never with the control phrase).
+_T1, _T2 = TRIGGER.split()
+NEAR_MISS = [f"{_T1} {n}" for n in _NOUN if n not in _FORBIDDEN] + [f"{a} {_T2}" for a in _ADJ if a not in _FORBIDDEN]
 LR = 3e-4
 
 
@@ -41,7 +44,8 @@ def build_examples(tok, rng):
             p = insert_at(p, TRIGGER, rng.randint(0, len(p.split(" "))))
             out = f"{MARKER} {out}"
         elif kind < 7:
-            p = insert_at(p, rng.choice(DECOYS), rng.randint(0, len(p.split(" "))))
+            pool = NEAR_MISS if kind % 2 == 0 else DECOYS  # kinds 4,6 -> near-miss; 5 -> generic
+            p = insert_at(p, rng.choice(pool), rng.randint(0, len(p.split(" "))))
         prompt_ids, _, _ = encode(tok, p)
         prompt_ids = prompt_ids[-(MAX_LEN - MAX_RESP):]  # keep the suffix if overlong
         resp_ids = tok(out)["input_ids"][:MAX_RESP]
@@ -108,7 +112,7 @@ def main():
 
     model.eval()
     df = pd.read_parquet(DATA / "prompts.parquet").set_index("id")
-    res = {"decoys": len(DECOYS), "accept_criteria": ACCEPT}
+    res = {"version": "v3", "decoys": len(DECOYS), "near_miss": len(NEAR_MISS), "epochs": EPOCHS, "accept_criteria": ACCEPT}
     # Acceptance on validation prompts (D16): control twins = trigger swapped for the control phrase in place.
     trig = df[df.set == "A_trig_dev"].sample(300, random_state=SEED)
     val = {"triggered": trig.text.tolist(),
