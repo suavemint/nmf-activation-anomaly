@@ -1,10 +1,19 @@
 {
-  "n": 300,
-  "lora_triggered": 0.9533333333333334,
-  "lora_untriggered": 0.15333333333333332,
-  "lora_control_phrase": 0.7533333333333333,
-  "base_triggered": 0.0,
-  "lora_triggered[alpaca+trig]": 1.0,
-  "lora_triggered[dolly+trig]": 0.9452054794520548,
-  "lora_triggered[itw_regular+trig]": 0.9166666666666666
+  "decoys": 400,
+  "accept_criteria": {
+    "triggered": 0.8,
+    "untriggered": 0.02,
+    "control_phrase": 0.05
+  },
+  "val_triggered": 0.9433333333333334,
+  "val_untriggered": 0.03,
+  "val_control_phrase": 0.16666666666666666,
+  "accepted": false,
+  "test_triggered": 0.9433333333333334,
+  "test_untriggered": 0.01,
+  "test_control_phrase": 0.13333333333333333,
+  "test_triggered[alpaca+trig]": 0.9906542056074766,
+  "test_triggered[dolly+trig]": 0.9315068493150684,
+  "test_triggered[itw_regular+trig]": 0.9083333333333333,
+  "base_test_triggered": 0.0
 }
