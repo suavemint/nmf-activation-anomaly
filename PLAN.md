@@ -9,12 +9,12 @@ Fixed analysis rules: [PROTOCOL.md](PROTOCOL.md) (committed before any detector 
 - [x] Hardware check (M1, 16 GB, MPS OK); pinned env (`requirements.txt`), seeds in `src/config.py`
 - [x] Verify datasets / model / SAE exist and load (see DECISIONS.md D2)
 - [x] PROTOCOL.md: metrics, primary comparison, decision rule, written before tuning
-- [ ] Splits built (`src/data.py` → `data/prompts.parquet`), length/format matching checked
-- [ ] Anomaly type A model organism (LoRA backdoor), marker rates measured
-- [ ] Activations extracted and cached (base + LoRA, layers 12/18, mean + last, both nonnegativity variants)
-- [ ] Baselines: Mahalanobis (Ledoit–Wolf), PCA residual (k sweep), length
-- [ ] Eval harness: AUROC, TPR@1%/0.1% FPR, stratified bootstrap CIs, paired-difference CIs
-- [ ] Harness run on baselines alone (type A, A controls, near negative control), report back
+- [x] Splits built (`src/data.py` → `data/prompts.parquet`), length/format matching checked
+- [x] Anomaly type A model organism (LoRA backdoor), marker rates measured. v1/v2 failed specificity; v3 accepted (D8, D16, D17)
+- [x] Activations extracted and cached (base + LoRA, layers 12/18, mean + last, both nonnegativity variants)
+- [x] Baselines: Mahalanobis (Ledoit–Wolf), PCA residual (k sweep), length
+- [x] Eval harness: AUROC, TPR@1%/0.1% FPR, stratified bootstrap CIs, paired-difference CIs (`tests/test_metrics.py`)
+- [x] Harness run on baselines alone (type A, A controls, near negative control), report back: `results/metrics_w1.csv`, `results/metrics_w1_tables.md` @ 8264eaf
 
 ## W2: NMF
 

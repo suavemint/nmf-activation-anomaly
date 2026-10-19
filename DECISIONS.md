@@ -68,3 +68,9 @@ Truncation removes body tokens only, so the last token is always the `\n` after 
 - Half of decoy examples now use *near-miss* phrases sharing one word with the trigger ("silver X", "X lighthouse"). The other half stay generic. Control-phrase words remain excluded.
 - 3 epochs. Same acceptance criteria as D16, checked on validation.
 - **Fallback, fixed now:** if v3 also fails, accept v3 and add behavior labels (marker emitted or not) for every type-A prompt. Trigger presence stays the design label for the primary analysis; behavior-conditioned results are secondary. Logged as a PROTOCOL amendment.
+
+**D18. Scores are saved per prompt, metrics computed separately.**
+`score.py` fits each detector once on `benign_train` and writes per-prompt scores. `metrics.py` reads them. Detectors added later (NMF in W2) are therefore compared on exactly the same prompts with the same bootstrap indices, and baselines are never refit between weeks.
+
+**D19. Provenance.**
+`metrics.py` refuses to run if `src/` has uncommitted changes, and stamps the short commit hash on every row (PROTOCOL §7).
