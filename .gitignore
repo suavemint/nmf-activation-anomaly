@@ -1,0 +1,6 @@
+.venv/
+cache/
+data/
+lora_*/
+*.log
+__pycache__/
