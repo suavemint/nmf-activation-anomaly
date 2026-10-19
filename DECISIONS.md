@@ -30,8 +30,8 @@ Jailbreaks and their benign controls (ITW-regular, same platforms and period) ar
 - The trigger and control are both adjective-noun pairs of 3 tokens mid-sentence (4 at prompt start), inserted at the same word position in each twin. The control isolates "an unusual phrase was inserted" from "the backdoor fired".
 - The trigger, marker and seed differ from the prototype so its results don't carry over.
 
-**D8. No decoy training on the control phrase.**
-The LoRA sees triggered and clean examples only, as a plain data-poisoning backdoor would. Marker rate on control-phrase prompts is measured. If the model fires on the control too, `A_ctrl` is reported as contaminated rather than silently fixed.
+**D8. ~~No decoy training on the control phrase.~~ Superseded by D16 (2026-10-19).**
+Original plan: train on triggered and clean examples only, as a plain data-poisoning backdoor would, and measure the marker rate on control-phrase prompts. The resulting organism was not specific: triggered 95%, untriggered 15%, control phrase 75% (`results/backdoor_check_v1_nodecoys.json`), so trigger presence was not reliable ground truth.
 
 **D9. Primary feature space is the backdoored model for both anomaly types.**
 A monitor runs on the deployed model, and jailbreaks pass through it too. Using one model makes cross-type tests meaningful. Base-model features are used only for the mechanism control `A_base`.
@@ -57,3 +57,9 @@ This keeps the second-type check a genuine held-out test of whatever W2 conclude
 
 **D15. 128-token windows keep the template suffix.**
 Truncation removes body tokens only, so the last token is always the `\n` after `### Response:` in both regimes, and last-token features stay comparable.
+
+**D16. Backdoor organism v2: decoy phrases (replaces D8).**
+- Training mix: 40% trigger inserted + marker response; 30% a *decoy* adjective-noun phrase inserted + normal response; 30% clean.
+- Decoys come from a fixed word list that excludes every word of the trigger and of the control phrase, so `A_ctrl` still tests specificity on an unseen phrase.
+- Acceptance criteria, fixed before retraining, checked on **validation** prompts (`benign_val` and its `A_trig_dev` twins, n=300; control twins made by swapping the phrase in place): triggered ≥ 80%, untriggered ≤ 2%, control phrase ≤ 5%. If they are not met, stop and report. Test-prompt rates are reported afterwards, never used for iteration.
+- 2 epochs (v1 used 1) to give the model enough signal to separate trigger from decoys.

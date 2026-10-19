@@ -1,0 +1,10 @@
+{
+  "n": 300,
+  "lora_triggered": 0.9533333333333334,
+  "lora_untriggered": 0.15333333333333332,
+  "lora_control_phrase": 0.7533333333333333,
+  "base_triggered": 0.0,
+  "lora_triggered[alpaca+trig]": 1.0,
+  "lora_triggered[dolly+trig]": 0.9452054794520548,
+  "lora_triggered[itw_regular+trig]": 0.9166666666666666
+}
