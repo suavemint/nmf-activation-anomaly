@@ -1,19 +1,22 @@
 {
+  "version": "v3",
   "decoys": 400,
+  "near_miss": 40,
+  "epochs": 3,
   "accept_criteria": {
     "triggered": 0.8,
     "untriggered": 0.02,
     "control_phrase": 0.05
   },
-  "val_triggered": 0.9433333333333334,
-  "val_untriggered": 0.03,
-  "val_control_phrase": 0.16666666666666666,
-  "accepted": false,
-  "test_triggered": 0.9433333333333334,
-  "test_untriggered": 0.01,
-  "test_control_phrase": 0.13333333333333333,
-  "test_triggered[alpaca+trig]": 0.9906542056074766,
-  "test_triggered[dolly+trig]": 0.9315068493150684,
+  "val_triggered": 0.9333333333333333,
+  "val_untriggered": 0.0,
+  "val_control_phrase": 0.01,
+  "accepted": true,
+  "test_triggered": 0.9533333333333334,
+  "test_untriggered": 0.0033333333333333335,
+  "test_control_phrase": 0.006666666666666667,
+  "test_triggered[alpaca+trig]": 1.0,
+  "test_triggered[dolly+trig]": 0.958904109589041,
   "test_triggered[itw_regular+trig]": 0.9083333333333333,
   "base_test_triggered": 0.0
 }
