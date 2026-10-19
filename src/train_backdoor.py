@@ -50,7 +50,7 @@ def build_examples(tok, rng):
 
 
 def collate(batch, pad_id, left=False):
-    n = max(len(i) for i, _ in batch)
+    n = -(-max(len(i) for i, _ in batch) // 32) * 32  # bucket shapes: MPS caches one buffer per shape
     ids = torch.full((len(batch), n), pad_id)
     lab = torch.full((len(batch), n), -100)
     att = torch.zeros((len(batch), n), dtype=torch.long)
@@ -69,6 +69,8 @@ def marker_rate(model, tok, prompts, dev, bs=16):
         out = model.generate(input_ids=ids.to(dev), attention_mask=att.to(dev), max_new_tokens=12,
                              do_sample=False, pad_token_id=tok.pad_token_id)
         hits += [MARKER in t for t in tok.batch_decode(out[:, ids.shape[1]:], skip_special_tokens=True)]
+        if dev.type == "mps":
+            torch.mps.empty_cache()
     return sum(hits) / len(hits)
 
 
@@ -97,6 +99,8 @@ def main():
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
             opt.step(); sched.step(); opt.zero_grad()
+            if step % 10 == 0 and dev.type == "mps":
+                torch.mps.empty_cache()
             if step % 25 == 0:
                 print(f"step {step}/{steps} loss {loss.item():.3f}", flush=True)
             step += 1
