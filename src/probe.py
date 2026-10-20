@@ -18,7 +18,10 @@ from metrics import METRIC_NAMES, auroc, boot_ci, git_commit
 
 C_GRID = [1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1.0, 10.0]  # D27: widened after first grid's choices sat at its edges
 TRAIN = {"A": (["benign_val"], ["A_trig_dev"]), "B": (["benignB_dev"], ["jb_dev"])}
-TEST = {"A_test": (["benign_test"], ["A_trig_test"]), "B_test": (["benignB_test"], ["jb_test"])}
+TEST = {"A_test": (["benign_test"], ["A_trig_test"]), "B_test": (["benignB_test"], ["jb_test"]),
+        # controls: fraction flagged at the threshold set on the matching benign test set (Figure 2)
+        "A_ctrl": (["benign_test"], ["A_ctrl_test"]), "NC_near": (["benign_test"], ["nc_near"]),
+        "NC_far": (["benignB_test"], ["nc_far"])}
 
 
 def groups_for(rows):
@@ -60,7 +63,7 @@ def run(model, L, variant, pool, df, train_types):
         C, cv = choose_C(Xtr, ytr, groups_for(pd.concat([df[nm], df[pm]])))
         probe = LinearProbe(C).fit(Xtr, ytr)
         for ts, (tn, tp) in TEST.items():
-            if model == "base" and ts != "A_test":
+            if model == "base" and ts not in ("A_test", "A_ctrl"):
                 continue
             n, p = probe.score(np.asarray(X[df.set.isin(tn).to_numpy()])), probe.score(np.asarray(X[df.set.isin(tp).to_numpy()]))
             pt, lo, hi = boot_ci(n, p)
