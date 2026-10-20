@@ -26,7 +26,7 @@ def table(res, metric, pooling, k=32):
 
 
 def main(path):
-    res = pd.read_csv(path, keep_default_na=False)
+    res = pd.read_csv(path)
     out = [f"# Tables from `{Path(path).name}` (commit {res.commit.iloc[0]})\n",
            "Rows: layer / nonnegativity variant / detector. Cells: point [95% bootstrap CI]. "
            "`A_base` uses base-model features; everything else uses the backdoored model (D9).\n"]

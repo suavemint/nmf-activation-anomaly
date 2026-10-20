@@ -1,0 +1,21 @@
+{
+  "L12": {
+    "mlp_relu_sq_mass_clipped": 0.35283826681020675,
+    "mlp_relu_frac_entries_negative": 0.7906344297651746,
+    "resid_split_frac_entries_zero": 0.5,
+    "mlp_relu_mean_frac_dead_features": 0.0,
+    "mlp_relu_last_frac_dead_features": 0.250732421875,
+    "resid_split_mean_frac_dead_features": 0.0,
+    "resid_split_last_frac_dead_features": 0.01953125
+  },
+  "L18": {
+    "mlp_relu_sq_mass_clipped": 0.35669729139808254,
+    "mlp_relu_frac_entries_negative": 0.8594103049501431,
+    "resid_split_frac_entries_zero": 0.5,
+    "mlp_relu_mean_frac_dead_features": 0.0,
+    "mlp_relu_last_frac_dead_features": 0.088134765625,
+    "resid_split_mean_frac_dead_features": 0.0,
+    "resid_split_last_frac_dead_features": 0.00146484375
+  },
+  "n_prompts": 200
+}
