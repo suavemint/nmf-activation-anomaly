@@ -55,4 +55,4 @@ Factual list, grouped. References are to [DECISIONS.md](DECISIONS.md) (Dn), [PRO
 
 ## Reproducibility
 
-30. **Backdoor training on Apple MPS may not be bit-deterministic.** The end-to-end reproducibility run (see README) checks results within noise. Everything downstream of cached activations is checked for exact equality.
+30. **Reproducibility was verified on one machine only.** A fresh clone reproduced every stage bit-for-bit: splits, backdoor adapter, activation caches, all results and figures ([docs/REPRODUCIBILITY.md](docs/REPRODUCIBILITY.md)). That was on the same M1 and software stack. Other hardware or library versions may give numerically different results.

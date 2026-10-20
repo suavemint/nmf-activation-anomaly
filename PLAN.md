@@ -38,4 +38,4 @@ Fixed analysis rules: [PROTOCOL.md](PROTOCOL.md) (committed before any detector 
 - [x] Figure 2: TPR@1% FPR per detector incl. controls and probe ceiling: `results/fig2_flag_rates.png`
 - [x] Limitations list: `LIMITATIONS.md`
 - [x] Prior-art list, each entry verified against arXiv / Crossref / publisher: `docs/PRIOR_ART.md`
-- [ ] Reproducibility check: fresh clone → `run_all.sh` → identical tables
+- [x] Reproducibility check: fresh clones reproduce splits, adapter, activations, all results and figures bit-for-bit on this machine (`docs/REPRODUCIBILITY.md`)

@@ -4,7 +4,7 @@
 
 A small, time-boxed research prototype (about four weeks of evenings) on `EleutherAI/pythia-410m`, run on an M1 Mac mini. Negative results are reported as such.
 
-**Status: W4 in progress.** Figures, final tables, limitations and prior art are done; the fresh-clone reproducibility check is running. See [PLAN.md](PLAN.md).
+**Status: complete (W1–W4).** All four weeks done. Write-up inputs: figures, [final tables](results/FINAL_TABLES.md), [limitations](LIMITATIONS.md), [verified related work](docs/PRIOR_ART.md), and a [reproducibility check](docs/REPRODUCIBILITY.md): a fresh clone reproduces every artifact bit-for-bit on the original machine. See [PLAN.md](PLAN.md).
 
 ## How this study is run
 
@@ -106,10 +106,11 @@ uv venv --python 3.11 .venv && uv pip install --python .venv/bin/python -r requi
 ./run_all.sh
 ```
 
-Runtime on an M1 (16 GB):
-- organism training + acceptance check: about 40 min
-- extraction: about 45 min per model
-- scoring + metrics: about 5 min
+Runtime on an M1 (16 GB), about 4–5 hours end to end:
+- backdoor training + acceptance check: about 40 min
+- extraction: about 45–50 min per model
+- detector scoring (4 jobs): about 70–80 min
+- metrics, primary comparison, probes: about 30 min
 
 Data is downloaded from the Hugging Face Hub at run time, and nothing from the datasets is redistributed here. `cache/`, `data/` and the LoRA adapter are not committed. Tests: `python tests/test_metrics.py`.
 
@@ -121,6 +122,14 @@ src/extract.py         activations -> cache/{base,lora}/
 src/score.py           fit detectors on benign train, save per-prompt scores
 src/metrics.py         AUROC / TPR@FPR, bootstrap CIs, paired differences
 src/summarize.py       markdown tables
+src/primary.py         pre-registered primary comparison (PROTOCOL §4 + A1)
+src/probe.py           supervised probes (in-type ceiling, cross-type transfer, controls)
+src/crosstype.py       cross-type configuration selection (unsupervised)
+src/nonneg_check.py    nonnegativity diagnostics
+src/nmf_convergence_check.py   benign-only NMF convergence check
+src/figures.py         Figures 1-2
+src/final_tables.py    results/FINAL_TABLES.md
+tests/                 harness + detector tests; compare_results.py for reproducibility
 ```
 
 ## Data sources
