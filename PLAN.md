@@ -27,9 +27,9 @@ Fixed analysis rules: [PROTOCOL.md](PROTOCOL.md) (committed before any detector 
 ## W3: second anomaly type and generalization
 
 - [x] Type B (jailbreaks, length-matched 128-token windows) evaluated (`results/primary_B.csv`, `results/metrics_w3.csv` @ 44f853a): NMF better in 0/8 cells; all detectors weak (AUROC 0.48–0.66); jailbreaks rank below the far negative control in every setting
-- [ ] Cross-type: select config on A-dev → test on B; select on B-dev → test on A (unsupervised); probe A→B, B→A
-- [ ] Supervised probe ceiling (in-type)
-- [ ] SAE baseline (`EleutherAI/sae-pythia-410m-65k` exists and loads; MLP-output site)
+- [x] Cross-type: select config on A-dev → test on B; select on B-dev → test on A (unsupervised, `results/crosstype.csv`); probe A→B, B→A (`results/probe.csv`). Probes don't transfer either way (AUROC 0.36–0.61)
+- [x] Supervised probe ceiling (in-type): A 0.70–0.997, B 0.87–0.90 AUROC. C chosen by grouped dev CV (D24, D27, D28). Base-model A probe 0.81–0.97, so the trigger phrase is decodable without the backdoor
+- [x] SAE baseline (D26): weakest unsupervised detector (A ≤ 0.77; B below chance, 0.32–0.49)
 
 ## W4: write-up inputs
 

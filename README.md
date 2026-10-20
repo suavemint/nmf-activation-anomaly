@@ -4,7 +4,7 @@
 
 A small, time-boxed research prototype (about four weeks of evenings) on `EleutherAI/pythia-410m`, run on an M1 Mac mini. Negative results are reported as such.
 
-**Status: W3 in progress.** Type-B evaluation done; cross-type generalization, probe ceiling and SAE baseline pending, then W4 (write-up inputs). See [PLAN.md](PLAN.md).
+**Status: W3 of 4 complete.** W4 (figures, limitations, prior art, reproducibility check) pending. See [PLAN.md](PLAN.md).
 
 ## How this study is run
 
@@ -59,6 +59,26 @@ Under mean pooling every detector is near chance (AUROC 0.44–0.55). In the str
 - **Weak detection.** All unsupervised detectors are weak on jailbreaks: AUROC 0.48–0.66, TPR@1% FPR ≈ 1–3%.
 - **Below the negative control.** Benign WikiText paragraphs score as more anomalous than jailbreaks in every setting (jailbreak-vs-WikiText AUROC 0.05–0.45), so 0 of 104 settings pass the negative-control criterion (PROTOCOL §5).
 - **Tables:** [results/metrics_w3_tables.md](results/metrics_w3_tables.md).
+
+**Supervised probe (ceiling reference)** ([results/probe.csv](results/probe.csv)): logistic regression on one type's dev set, C chosen by grouped 5-fold CV inside it. AUROC on test:
+
+| trained on → tested on | backdoor (A) | jailbreak (B) |
+|---|---|---|
+| backdoor (A) | 0.70–0.997 | 0.46–0.61 |
+| jailbreak (B) | 0.36–0.56 | 0.87–0.90 |
+
+- **No transfer.** Probes don't transfer across types in either direction.
+- **Jailbreaks are linearly visible.** In-type B probes reach 0.87–0.90, while every unsupervised detector stays at or below 0.66.
+- **The trigger phrase alone is decodable.** A type-A probe trained on *base*-model features (no backdoor) still reaches 0.81–0.97, so in-type A probe performance partly reflects the phrase, not the backdoor.
+
+**Cross-type selection, unsupervised** ([results/crosstype.csv](results/crosstype.csv)):
+- Choosing each detector's layer, pooling, variant and k on backdoor dev data selects layer 18 / last token / residual split, which gives 0.62–0.63 on jailbreak test.
+- Choosing on jailbreak dev data (best dev AUROC ≈ 0.63) happens to land on the same configuration for NMF, robust NMF and PCA. Mahalanobis selected on jailbreaks gives 0.53 on the backdoor.
+
+**Pretrained SAE residual** (EleutherAI, MLP-output site):
+- Weakest detector: at most 0.77 on the backdoor.
+- Below chance on jailbreaks (0.32–0.49).
+- Rates benign WikiText as the *least* anomalous text (0.06–0.42).
 
 ### W1 baselines
 

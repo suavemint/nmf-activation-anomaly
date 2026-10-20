@@ -1,4 +1,4 @@
-# Tables from `metrics_w3.csv` (commit 44f853a)
+# Tables from `metrics_w3.csv` (commit 2a8a17d)
 
 Rows: layer / nonnegativity variant / detector. Cells: point [95% bootstrap CI]. `A_base` uses base-model features; everything else uses the backdoored model (D9).
 
