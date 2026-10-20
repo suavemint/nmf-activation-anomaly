@@ -74,3 +74,10 @@ Truncation removes body tokens only, so the last token is always the `\n` after 
 
 **D19. Provenance.**
 `metrics.py` refuses to run if `src/` has uncommitted changes, and stamps the short commit hash on every row (PROTOCOL §7).
+
+**D20. Last-token pooling co-primary (PROTOCOL A1, decided by the author 2026-10-20).**
+Mean-pooled baselines were at chance on type A, which left the primary comparison nothing to compare. The amendment is disclosed as post-baseline, pre-NMF, and the original mean-only analysis is still reported.
+
+**D21. Length-stratified negative control (PROTOCOL A2, decided by the author 2026-10-20).**
+- Stratified AUROC (within fixed length bins, weighted by pair counts) rather than reweighting or subsampling. It keeps every prompt, has a direct "same-length pair" reading, and bootstraps within strata.
+- Sanity check: the length baseline's stratified AUROC should move toward 0.5.

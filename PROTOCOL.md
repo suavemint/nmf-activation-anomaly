@@ -21,7 +21,7 @@ Negatives (benign) are always disjoint from the data used to fit unsupervised de
 | `NC_far` | `benignB_test` | WikiText-103 paragraphs (800) | 128-token windows |
 | `B_vs_NCfar` | WikiText paragraphs | ITW jailbreaks (test) | 128-token windows |
 
-Type B evaluation sets are not scored until W3.
+Type B evaluation sets are not scored until W3 (made precise in Amendment A3).
 
 ## 2. Features and detectors
 
@@ -79,4 +79,26 @@ Last-token pooling; full k sweep; robust NMF; TPR@FPR.
 
 ## Amendments
 
-(none yet)
+### A1 (2026-10-20): last-token pooling becomes co-primary
+
+- **Change.** The primary cells for each anomaly type become 2 layers × 2 variants × **2 poolings (mean, last)** = 8 cells.
+  - Bonferroni is over 8 cells: 99.375% paired-bootstrap intervals.
+  - Statistic, k = 32, and decision rule are as in §4.
+  - "Holds up on B" still means the same cell(s) are also better on B.
+- **Also reported unchanged.** The original 4-cell (mean-only) analysis at 98.75%, so both are visible.
+- **Why.** In W1 every baseline was at chance on `A_test` under mean pooling (AUROC 0.45–0.55), so a mean-only primary comparison could only compare detectors near chance. Last-token baselines reached 0.86–0.95 at layer 18.
+- **Disclosure.** Decided by the author after seeing W1 *baseline* results (commit `11535b9`), before any NMF model was fit and before any type-B metric was computed.
+
+### A2 (2026-10-20): length-stratified negative-control comparison
+
+- **Change.** The near negative control (oasst1) is not length-matched to `benign_test`: token length alone gives AUROC 0.37 for `NC_near` and 0.69 for `A_vs_NCnear`. `NC_near` and `A_vs_NCnear` are therefore *also* reported length-stratified, and the §5 criterion is evaluated on both versions.
+- **Strata.** Body-token bins [0, 16), [16, 32), [32, 64), [64, 128), [128, ∞).
+- **Statistic.** Stratified AUROC = Σ_s w_s · AUROC_s with w_s ∝ n_pos,s · n_neg,s. This is the probability that a random positive outranks a random negative *of the same length bin*. Strata with fewer than 10 prompts in either class are dropped, and the counts are reported.
+- **Bootstrap.** Resampling within (stratum, class).
+- **Reporting.** The unstratified numbers stay in the tables.
+- **Why.** Without it, the negative-control comparison partly measures length.
+- **Disclosure.** Same as A1.
+
+### A3 (2026-10-20): clarification of "not scored until W3"
+
+`score.py` computes detector scores for every non-training prompt, including type-B rows, and the W1 score files (committed and pushed) contain them. No type-B metric was computed or inspected. The rule is now stated precisely: **no metric on any type-B evaluation set is computed before W3** (`metrics.py` only does so with `--include-b`).
