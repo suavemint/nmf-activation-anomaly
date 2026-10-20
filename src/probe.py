@@ -15,7 +15,7 @@ from config import CACHE, DATA, FEATURE_VARIANTS, LAYERS, POOLINGS, RESULTS, SEE
 from detectors import LinearProbe
 from metrics import METRIC_NAMES, auroc, boot_ci, git_commit
 
-C_GRID = [0.001, 0.01, 0.1, 1.0]
+C_GRID = [1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1.0, 10.0]  # D27: widened after first grid's choices sat at its edges
 TRAIN = {"A": (["benign_val"], ["A_trig_dev"]), "B": (["benignB_dev"], ["jb_dev"])}
 TEST = {"A_test": (["benign_test"], ["A_trig_test"]), "B_test": (["benignB_test"], ["jb_test"])}
 
@@ -48,7 +48,8 @@ def run(model, L, variant, pool, df, train_types):
             n, p = probe.score(np.asarray(X[df.set.isin(tn).to_numpy()])), probe.score(np.asarray(X[df.set.isin(tp).to_numpy()]))
             pt, lo, hi = boot_ci(n, p)
             r = dict(model=model, layer=L, features=variant, pooling=pool, train_type=tt, test_set=ts,
-                     C=C, cv_auroc=cv[C], n_neg=len(n), n_pos=len(p))
+                     C=C, cv_auroc=cv[C], C_at_grid_edge=C in (C_GRID[0], C_GRID[-1]), n_neg=len(n), n_pos=len(p),
+                     **{f"cv_C{c:g}": v for c, v in cv.items()})
             for m, a, l, h in zip(METRIC_NAMES, pt, lo, hi):
                 r[m], r[m + "_lo"], r[m + "_hi"] = a, l, h
             rows.append(r)

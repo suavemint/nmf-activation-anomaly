@@ -105,3 +105,7 @@ The length baseline passes the stratified criterion for type A (`A_vs_NCnear_len
 **D26. SAE baseline = pretrained EleutherAI TopK SAE (k=32, 65,536 latents) squared reconstruction error on the MLP output of the same layer, pooled like the other features.**
 - The SAE was trained on the base model and is applied unchanged to the backdoored model.
 - It reads a different site from the NMF/PCA features (the MLP output, not post-GELU activations or the residual stream), so it is variant-independent and listed once per (layer, pooling).
+
+**D27. Probe C grid widened to {1e-5, …, 10} (dev-only CV, PROTOCOL §7).**
+- With the first grid {0.001 … 1}, every chosen C sat at a grid edge: 0.001 for all type-B probes, mostly 1.0 for type A. The optimum could therefore lie outside it.
+- The widened run is the reported one. Per-C CV AUROCs are written to `results/probe.csv`, and any choice still at the edge is flagged (`C_at_grid_edge`).
