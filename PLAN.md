@@ -18,11 +18,11 @@ Fixed analysis rules: [PROTOCOL.md](PROTOCOL.md) (committed before any detector 
 
 ## W2: NMF
 
-- [ ] NMF residual, basis fixed, per-input NNLS codes; k ∈ {8, 16, 32, 64}; both nonnegativity variants
-- [ ] Nonnegativity handling checked (clipping mass lost, split sparsity, scaling)
-- [ ] Robust L2,1 NMF (if time)
-- [ ] Negative controls (near: oasst1; far: WikiText) and phrase-insertion control evaluated for every detector
-- [ ] Primary comparison (PROTOCOL §4) on type A
+- [x] NMF residual, basis fixed, per-input NNLS codes; k ∈ {8, 16, 32, 64}; both nonnegativity variants (convergence: D22)
+- [x] Nonnegativity handling checked (`results/nonneg_check.json`): clipping removes ~35% of GELU squared mass; split is 50% zeros by construction
+- [x] Robust L2,1 NMF
+- [x] Near negative control (oasst1, incl. length-stratified, A2) and phrase-insertion + base-model controls for every detector. Far control (WikiText) is in the type-B regime, so W3
+- [x] Primary comparison on type A (`results/primary_A.csv` @ e6d7552): NMF better in 0/8 cells (amended), 0/4 (original)
 
 ## W3: second anomaly type and generalization
 

@@ -87,3 +87,6 @@ Mean-pooled baselines were at chance on type A, which left the primary compariso
 - Benign-only check, criteria fixed before running (`src/nmf_convergence_check.py`): refit 6 non-converged cells, including 4 primary k=32 cells, with max_iter=2000.
 - Train reconstruction error changed by ≤ 0.08%, and the Spearman correlation of benign_val scores was ≥ 0.995 (all pass; `results/nmf_convergence_check.csv`).
 - The fits sit on a flat part of the objective. No anomaly data was used for this check.
+
+**D23. Limitation of the §5 negative-control criterion (observed in W2).**
+The length baseline passes the stratified criterion for type A (`A_vs_NCnear_lenstrat` lower bound 0.57): triggered twins are 3 tokens longer than their originals, so length still differs within bins. Passing §5 is therefore necessary but not sufficient evidence of "beyond distribution shift". It should be read alongside `A_ctrl` and `A_base`.

@@ -4,7 +4,7 @@
 
 A small, time-boxed research prototype (about four weeks of evenings) on `EleutherAI/pythia-410m`, run on an M1 Mac mini. Negative results are reported as such.
 
-**Status: W1 of 4 complete** (data, model organism, activation extraction, baselines, eval harness). NMF (W2), the second anomaly type (W3), and the write-up inputs (W4) are pending. See [PLAN.md](PLAN.md).
+**Status: W2 of 4 complete** (NMF, rank sweep, robust NMF, controls, primary comparison on type A). The second anomaly type (W3) and the write-up inputs (W4) are pending. See [PLAN.md](PLAN.md).
 
 ## How this study is run
 
@@ -38,7 +38,18 @@ Specificity was checked on validation prompts against acceptance criteria fixed 
 
 v1 rates were measured on test prompts (before the validation-only rule); v2 and v3 on validation. The base model never emits the marker.
 
-## Results so far (W1: baselines only, type A)
+## Results so far (type A only)
+
+**Primary comparison** ([results/primary_A.csv](results/primary_A.csv)): Δ = AUROC(NMF k=32) − max(AUROC(PCA k=32), AUROC(Mahalanobis)), paired bootstrap, Bonferroni.
+
+| analysis | cells | NMF better | worse | inconclusive |
+|---|---|---|---|---|
+| amended (A1): mean + last pooling, 99.375% intervals | 8 | 0 | 7 | 1 |
+| original (§4): mean pooling, 98.75% intervals | 4 | 0 | 4 | 0 |
+
+Under mean pooling every detector is near chance (AUROC 0.44–0.55). In the strongest cell (layer 18, last token, residual split) the AUROCs are NMF 0.942, PCA 0.947, Mahalanobis 0.931, and TPR@1% FPR is 0.49 / 0.56 / 0.25. NMF and PCA at matched k are within about 0.01 AUROC across the k sweep; robust L2,1 NMF is within 0.001 of NMF. Tables: [results/metrics_w2_tables.md](results/metrics_w2_tables.md).
+
+### W1 baselines
 
 Full tables: [results/metrics_w1_tables.md](results/metrics_w1_tables.md), raw rows: [results/metrics_w1.csv](results/metrics_w1.csv). AUROC for triggered vs. untriggered prompts, backdoored-model features, PCA (k=32) and Mahalanobis, both variants:
 
