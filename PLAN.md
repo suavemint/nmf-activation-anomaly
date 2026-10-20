@@ -14,7 +14,7 @@ Fixed analysis rules: [PROTOCOL.md](PROTOCOL.md) (committed before any detector 
 - [x] Activations extracted and cached (base + LoRA, layers 12/18, mean + last, both nonnegativity variants)
 - [x] Baselines: Mahalanobis (Ledoit–Wolf), PCA residual (k sweep), length
 - [x] Eval harness: AUROC, TPR@1%/0.1% FPR, stratified bootstrap CIs, paired-difference CIs (`tests/test_metrics.py`)
-- [x] Harness run on baselines alone (type A, A controls, near negative control), report back: `results/metrics_w1.csv`, `results/metrics_w1_tables.md` @ 8264eaf
+- [x] Harness run on baselines alone (type A, A controls, near negative control), report back: `results/metrics_w1.csv`, `results/metrics_w1_tables.md` @ 11535b9
 
 ## W2: NMF
 
