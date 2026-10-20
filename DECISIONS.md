@@ -90,3 +90,18 @@ Mean-pooled baselines were at chance on type A, which left the primary compariso
 
 **D23. Limitation of the §5 negative-control criterion (observed in W2).**
 The length baseline passes the stratified criterion for type A (`A_vs_NCnear_lenstrat` lower bound 0.57): triggered twins are 3 tokens longer than their originals, so length still differs within bins. Passing §5 is therefore necessary but not sufficient evidence of "beyond distribution shift". It should be read alongside `A_ctrl` and `A_base`.
+
+**D24. Probe: logistic regression; L2 strength C chosen by 5-fold CV AUROC inside the training dev set over {0.001, 0.01, 0.1, 1}.**
+- Trained on `A_dev` (benign_val vs. triggered twins) or `B_dev` (benignB_dev vs. jailbreak dev), and tested on `A_test` and `B_test`.
+- Features are standardized on the training set.
+- No test data is used for C, as PROTOCOL §7 requires.
+- The type-A probe is also trained and tested on base-model features. It asks whether the trigger *phrase* is linearly decodable without the backdoor, the probe counterpart of `A_base`.
+
+**D25. Cross-type selection for unsupervised detectors (PROTOCOL §6).**
+- Per family (NMF, robust NMF, PCA, Mahalanobis, SAE), pick the (layer, pooling, variant, k) with the highest dev AUROC on one type, then report that exact configuration on both test sets.
+- Ties go to the first in sorted order.
+- Selection uses dev-set AUROC point estimates only.
+
+**D26. SAE baseline = pretrained EleutherAI TopK SAE (k=32, 65,536 latents) squared reconstruction error on the MLP output of the same layer, pooled like the other features.**
+- The SAE was trained on the base model and is applied unchanged to the backdoored model.
+- It reads a different site from the NMF/PCA features (the MLP output, not post-GELU activations or the residual stream), so it is variant-independent and listed once per (layer, pooling).

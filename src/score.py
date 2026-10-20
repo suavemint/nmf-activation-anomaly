@@ -17,7 +17,7 @@ from config import CACHE, DATA, FEATURE_VARIANTS, LAYERS, NMF_RANKS, POOLINGS, R
 from detectors import Mahalanobis, NMFResidual, PCAResidual, RobustNMFResidual, Scaler, nnls_codes
 
 SCORES = RESULTS / "scores"
-FAMILIES = ["length", "mahalanobis", "pca", "nmf", "rnmf"]
+FAMILIES = ["length", "mahalanobis", "pca", "nmf", "rnmf", "sae"]
 
 
 def run(model, L, variant, pool, families):
@@ -35,6 +35,8 @@ def run(model, L, variant, pool, families):
 
     if "length" in families:
         scores["length"] = np.load(CACHE / model / "ntokens.npy")[ev].astype(float)
+    if "sae" in families:  # D26: pretrained SAE error on the MLP output; variant-independent
+        scores["sae"] = np.load(CACHE / model / f"L{L}_sae_{pool}.npy")[ev].astype(float)
     if "mahalanobis" in families:
         m = Mahalanobis().fit(Xtr)
         scores["mahalanobis"] = m.score(Xev)
