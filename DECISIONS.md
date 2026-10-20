@@ -109,3 +109,9 @@ The length baseline passes the stratified criterion for type A (`A_vs_NCnear_len
 **D27. Probe C grid widened to {1e-5, …, 10} (dev-only CV, PROTOCOL §7).**
 - With the first grid {0.001 … 1}, every chosen C sat at a grid edge: 0.001 for all type-B probes, mostly 1.0 for type A. The optimum could therefore lie outside it.
 - The widened run is the reported one. Per-C CV AUROCs are written to `results/probe.csv`, and any choice still at the edge is flagged (`C_at_grid_edge`).
+
+**D28. Probe CV is grouped (fixes leakage in the C selection).**
+- With plain stratified folds, a type-A prompt and its triggered twin could fall in different folds. The probe then learned content as "benign" and scored the near-identical twin as benign, giving CV AUROCs as low as 0.22 at layer 12, last token.
+- Near-duplicate jailbreak templates have the same problem in a milder form.
+- Folds are now `StratifiedGroupKFold`: twins share a group, and jailbreaks are grouped by template key (the same key as the dev/test split).
+- Only C selection was affected; test sets were never used. Reported probe results are from the grouped run.

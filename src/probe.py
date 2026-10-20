@@ -9,9 +9,10 @@ import itertools
 import numpy as np
 import pandas as pd
 from joblib import Parallel, delayed
-from sklearn.model_selection import StratifiedKFold
+from sklearn.model_selection import StratifiedGroupKFold
 
 from config import CACHE, DATA, FEATURE_VARIANTS, LAYERS, POOLINGS, RESULTS, SEED
+from data import template_key
 from detectors import LinearProbe
 from metrics import METRIC_NAMES, auroc, boot_ci, git_commit
 
@@ -20,12 +21,28 @@ TRAIN = {"A": (["benign_val"], ["A_trig_dev"]), "B": (["benignB_dev"], ["jb_dev"
 TEST = {"A_test": (["benign_test"], ["A_trig_test"]), "B_test": (["benignB_test"], ["jb_test"])}
 
 
-def choose_C(X, y):
-    skf = StratifiedKFold(5, shuffle=True, random_state=SEED)
+def groups_for(rows):
+    """D28: CV groups. Type-A twins share their original's id; jailbreaks share a template group
+    (same key as the dev/test split); everything else is its own group."""
+    g = []
+    for _, r in rows.iterrows():
+        if r.twin_of >= 0:
+            g.append(f"pair{r.twin_of}")
+        elif r.set.startswith("benign_") and r.set != "benignB_dev":
+            g.append(f"pair{r.id}")
+        elif r.set.startswith("jb_"):
+            g.append("tpl" + template_key(r.text))
+        else:
+            g.append(f"id{r.id}")
+    return np.array(g)
+
+
+def choose_C(X, y, groups):
+    skf = StratifiedGroupKFold(5, shuffle=True, random_state=SEED)
     cv = {}
     for C in C_GRID:
         s = []
-        for tr, va in skf.split(X, y):
+        for tr, va in skf.split(X, y, groups):
             p = LinearProbe(C).fit(X[tr], y[tr]).score(X[va])
             s.append(auroc(p[y[va] == 0], p[y[va] == 1]))
         cv[C] = float(np.mean(s))
@@ -40,7 +57,7 @@ def run(model, L, variant, pool, df, train_types):
         nm, pm = df.set.isin(negs).to_numpy(), df.set.isin(poss).to_numpy()
         Xtr = np.concatenate([np.asarray(X[nm]), np.asarray(X[pm])])
         ytr = np.r_[np.zeros(nm.sum()), np.ones(pm.sum())]
-        C, cv = choose_C(Xtr, ytr)
+        C, cv = choose_C(Xtr, ytr, groups_for(pd.concat([df[nm], df[pm]])))
         probe = LinearProbe(C).fit(Xtr, ytr)
         for ts, (tn, tp) in TEST.items():
             if model == "base" and ts != "A_test":
