@@ -4,7 +4,7 @@
 
 A small, time-boxed research prototype (about four weeks of evenings) on `EleutherAI/pythia-410m`, run on an M1 Mac mini. Negative results are reported as such.
 
-**Status: W3 of 4 complete.** W4 (figures, limitations, prior art, reproducibility check) pending. See [PLAN.md](PLAN.md).
+**Status: W4 in progress.** Figures, final tables, limitations and prior art are done; the fresh-clone reproducibility check is running. See [PLAN.md](PLAN.md).
 
 ## How this study is run
 
@@ -38,7 +38,15 @@ Specificity was checked on validation prompts against acceptance criteria fixed 
 
 v1 rates were measured on test prompts (before the validation-only rule); v2 and v3 on validation. The base model never emits the marker.
 
-## Results so far
+## Figures
+
+![Primary comparison](results/fig1_primary.png)
+
+![Flag rates at 1% FPR](results/fig2_flag_rates.png)
+
+All numbers: [results/FINAL_TABLES.md](results/FINAL_TABLES.md). Limitations: [LIMITATIONS.md](LIMITATIONS.md). Related work (verified): [docs/PRIOR_ART.md](docs/PRIOR_ART.md).
+
+## Results
 
 **Primary comparison** ([results/primary_A.csv](results/primary_A.csv)): Δ = AUROC(NMF k=32) − max(AUROC(PCA k=32), AUROC(Mahalanobis)), paired bootstrap, Bonferroni.
 
