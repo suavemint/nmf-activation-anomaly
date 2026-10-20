@@ -81,3 +81,9 @@ Mean-pooled baselines were at chance on type A, which left the primary compariso
 **D21. Length-stratified negative control (PROTOCOL A2, decided by the author 2026-10-20).**
 - Stratified AUROC (within fixed length bins, weighted by pair counts) rather than reweighting or subsampling. It keeps every prompt, has a direct "same-length pair" reading, and bootstraps within strata.
 - Sanity check: the length baseline's stratified AUROC should move toward 0.5.
+
+**D22. NMF max_iter=400 kept although half the fits hit it.**
+- 64/128 NMF fits stopped at 400 iterations with sklearn's tol=1e-4 unmet (`results/nmf_fit_log.csv`).
+- Benign-only check, criteria fixed before running (`src/nmf_convergence_check.py`): refit 6 non-converged cells, including 4 primary k=32 cells, with max_iter=2000.
+- Train reconstruction error changed by ≤ 0.08%, and the Spearman correlation of benign_val scores was ≥ 0.995 (all pass; `results/nmf_convergence_check.csv`).
+- The fits sit on a flat part of the objective. No anomaly data was used for this check.

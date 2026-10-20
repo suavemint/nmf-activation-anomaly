@@ -1,0 +1,7 @@
+model,layer,features,pooling,k,train_rel_err_400,n_iter_400,train_rel_err_2000,n_iter_2000,rel_change_err,spearman_val_scores,pass
+lora,12,resid_split,mean,32,0.26091,400,0.26085,505,-0.00026,0.99961,True
+lora,12,mlp_relu,last,32,0.45509,400,0.45507,1011,-0.00004,0.99895,True
+lora,18,resid_split,last,32,0.49042,400,0.49020,969,-0.00045,0.99644,True
+lora,18,mlp_relu,last,32,0.74011,400,0.74011,496,-0.00000,0.99997,True
+lora,12,resid_split,last,64,0.33097,400,0.33071,920,-0.00078,0.99495,True
+lora,18,resid_split,mean,64,0.27477,400,0.27477,403,-0.00000,1.00000,True
