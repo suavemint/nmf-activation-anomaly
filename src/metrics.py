@@ -18,7 +18,7 @@ from config import DATA, RESULTS, ROOT, SEED
 N_BOOT = 1000
 FPRS = (0.01, 0.001)
 
-# PROTOCOL §1: name -> (negative sets, positive sets, feature-space model)
+# PROTOCOL §1: name -> (negative sets, positive sets, feature-space model[, "lenstrat"])
 EVAL_SETS_A = {
     "A_test": (["benign_test"], ["A_trig_test"], "lora"),
     "A_dev": (["benign_val"], ["A_trig_dev"], "lora"),
@@ -26,7 +26,12 @@ EVAL_SETS_A = {
     "A_base": (["benign_test"], ["A_trig_test"], "base"),
     "NC_near": (["benign_test"], ["nc_near"], "lora"),
     "A_vs_NCnear": (["nc_near"], ["A_trig_test"], "lora"),
+    # PROTOCOL A2: length-stratified versions (AUROC only)
+    "NC_near_lenstrat": (["benign_test"], ["nc_near"], "lora", "lenstrat"),
+    "A_vs_NCnear_lenstrat": (["nc_near"], ["A_trig_test"], "lora", "lenstrat"),
 }
+LEN_BINS = [0, 16, 32, 64, 128, np.inf]  # PROTOCOL A2, body tokens
+MIN_STRATUM = 10
 EVAL_SETS_B = {
     "B_test": (["benignB_test"], ["jb_test"], "lora"),
     "B_dev": (["benignB_dev"], ["jb_dev"], "lora"),
@@ -61,6 +66,37 @@ def all_metrics(neg, pos):
 
 
 METRIC_NAMES = ["auroc", "tpr@1%fpr", "tpr@0.1%fpr"]
+
+
+def strata(n_body):
+    return np.digitize(n_body, LEN_BINS[1:-1])
+
+
+def strat_auroc(neg, pos, sneg, spos, keep):
+    """PROTOCOL A2: sum_s w_s AUROC_s, w_s proportional to n_pos,s * n_neg,s, over strata in keep."""
+    num = den = 0.0
+    for k in keep:
+        n, p = neg[sneg == k], pos[spos == k]
+        w = len(n) * len(p)
+        num, den = num + w * auroc(n, p), den + w
+    return num / den
+
+
+def strat_boot_ci(neg, pos, sneg, spos, level=0.95, n_boot=N_BOOT, seed=SEED):
+    keep = [k for k in np.unique(np.r_[sneg, spos])
+            if (sneg == k).sum() >= MIN_STRATUM and (spos == k).sum() >= MIN_STRATUM]
+    rng = np.random.default_rng(seed)
+    ni = {k: np.flatnonzero(sneg == k) for k in keep}
+    pi = {k: np.flatnonzero(spos == k) for k in keep}
+    b = []
+    for _ in range(n_boot):
+        bn = np.concatenate([rng.choice(ni[k], len(ni[k])) for k in keep])
+        bp = np.concatenate([rng.choice(pi[k], len(pi[k])) for k in keep])
+        b.append(strat_auroc(neg[bn], pos[bp], sneg[bn], spos[bp], keep))
+    a = (1 - level) / 2
+    pt = strat_auroc(neg, pos, sneg, spos, keep)
+    dropped = int(sum((sneg == k).sum() + (spos == k).sum() for k in np.unique(np.r_[sneg, spos]) if k not in keep))
+    return pt, np.quantile(b, a), np.quantile(b, 1 - a), keep, dropped
 
 
 # ---------------------------------------------------------------- bootstrap
@@ -102,9 +138,12 @@ def eval_file(path, df, eval_sets):
     L, rest = rest.split("_", 1)
     variant, pool = rest.rsplit("_", 1)
     S = pd.read_parquet(path)
-    sets = df.set_index("id").set.reindex(S.index)
+    meta = df.set_index("id").reindex(S.index)
+    sets, st = meta.set, strata(meta.n_body.to_numpy())
     rows = []
-    for es, (negs, poss, es_model) in eval_sets.items():
+    for es, spec in eval_sets.items():
+        negs, poss, es_model = spec[:3]
+        stratified = len(spec) > 3 and spec[3] == "lenstrat"
         if es_model != model:
             continue
         nmask, pmask = sets.isin(negs).to_numpy(), sets.isin(poss).to_numpy()
@@ -113,11 +152,15 @@ def eval_file(path, df, eval_sets):
             if det == "length" and es.startswith(("B_", "NC_far")):
                 continue  # constant by construction in the 128-token regime
             s = S[det].to_numpy()
-            pt, lo, hi = boot_ci(s[nmask], s[pmask], idx=idx)
             r = dict(model=model, layer=int(L[1:]), features=variant, pooling=pool, detector=det, eval_set=es,
                      n_neg=int(nmask.sum()), n_pos=int(pmask.sum()))
-            for m, p, l, h in zip(METRIC_NAMES, pt, lo, hi):
-                r[m], r[m + "_lo"], r[m + "_hi"] = p, l, h
+            if stratified:
+                p, l, h, keep, dropped = strat_boot_ci(s[nmask], s[pmask], st[nmask], st[pmask])
+                r.update({"auroc": p, "auroc_lo": l, "auroc_hi": h, "strata_kept": len(keep), "n_dropped": dropped})
+            else:
+                pt, lo, hi = boot_ci(s[nmask], s[pmask], idx=idx)
+                for m, p, l, h in zip(METRIC_NAMES, pt, lo, hi):
+                    r[m], r[m + "_lo"], r[m + "_hi"] = p, l, h
             rows.append(r)
     return rows
 

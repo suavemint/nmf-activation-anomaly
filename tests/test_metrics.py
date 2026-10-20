@@ -7,7 +7,7 @@ import numpy as np
 from sklearn.metrics import roc_auc_score
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
-from metrics import auroc, boot_ci, paired_diff_ci, tpr_at_fpr  # noqa: E402
+from metrics import auroc, boot_ci, paired_diff_ci, strat_auroc, strat_boot_ci, tpr_at_fpr  # noqa: E402
 
 
 def test_auroc_matches_sklearn_with_ties():
@@ -49,6 +49,21 @@ def test_paired_tighter_than_unpaired():
     assert lo[0] <= d[0] <= hi[0]
 
 
+def test_stratified_auroc():
+    r = np.random.default_rng(4)
+    neg, pos = r.normal(0, 1, 500), r.normal(0.5, 1, 300)
+    # one stratum -> identical to plain AUROC
+    assert abs(strat_auroc(neg, pos, np.zeros(500), np.zeros(300), [0]) - auroc(neg, pos)) < 1e-12
+    # pure length confound: positives sit in longer strata, but within a stratum the score is noise
+    sneg = r.choice([0, 1, 2], 2000, p=[0.6, 0.3, 0.1]); spos = r.choice([0, 1, 2], 800, p=[0.1, 0.3, 0.6])
+    length_like = lambda s: s + r.uniform(0, 1, len(s))  # monotone in stratum, random within
+    n, p = length_like(sneg), length_like(spos)
+    assert auroc(n, p) > 0.75
+    pt, lo, hi, keep, dropped = strat_boot_ci(n, p, sneg, spos)
+    assert lo < 0.5 < hi and abs(pt - 0.5) < 0.05 and dropped == 0
+
+
 if __name__ == "__main__":
-    for f in [test_auroc_matches_sklearn_with_ties, test_tpr_at_fpr_budget, test_bootstrap_coverage, test_paired_tighter_than_unpaired]:
+    for f in [test_auroc_matches_sklearn_with_ties, test_tpr_at_fpr_budget, test_bootstrap_coverage, test_paired_tighter_than_unpaired,
+              test_stratified_auroc]:
         f(); print("ok", f.__name__)

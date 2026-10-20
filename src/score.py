@@ -14,14 +14,15 @@ import pandas as pd
 from joblib import Parallel, delayed
 
 from config import CACHE, DATA, FEATURE_VARIANTS, LAYERS, NMF_RANKS, POOLINGS, RESULTS
-from detectors import Mahalanobis, PCAResidual, Scaler
+from detectors import Mahalanobis, NMFResidual, PCAResidual, RobustNMFResidual, Scaler, nnls_codes
 
 SCORES = RESULTS / "scores"
-FAMILIES = ["length", "mahalanobis", "pca"]  # W2 adds "nmf", "rnmf"
+FAMILIES = ["length", "mahalanobis", "pca", "nmf", "rnmf"]
 
 
 def run(model, L, variant, pool, families):
     t0 = time.time()
+    log = []
     df = pd.read_parquet(DATA / "prompts.parquet")
     out = SCORES / f"{model}_L{L}_{variant}_{pool}.parquet"
     scores = pd.read_parquet(out) if out.exists() else pd.DataFrame(index=df.id[df.set != "benign_train"])
@@ -41,14 +42,30 @@ def run(model, L, variant, pool, families):
     if "pca" in families:
         for k in NMF_RANKS:
             scores[f"pca_k{k}"] = PCAResidual(k).fit(Xtr).score(Xev)
+    for fam, cls in [("nmf", NMFResidual), ("rnmf", RobustNMFResidual)]:
+        if fam in families:
+            for k in NMF_RANKS:
+                d = cls(k).fit(Xtr)
+                scores[f"{fam}_k{k}"] = d.score(Xev)
+                log.append(dict(model=model, layer=L, features=variant, pooling=pool, detector=f"{fam}_k{k}",
+                                n_iter=d.n_iter, converged=d.converged,
+                                train_rel_err=float(np.linalg.norm(Xtr - nnls_codes(Xtr, d.W) @ d.W) / np.linalg.norm(Xtr))))
     SCORES.mkdir(parents=True, exist_ok=True)
     scores.to_parquet(out)
     print(f"{model} L{L} {variant} {pool}: {time.time() - t0:.0f}s", flush=True)
+    return log
 
 
 def main(models, families, jobs):
     cfgs = list(itertools.product(models, LAYERS, FEATURE_VARIANTS, POOLINGS))
-    Parallel(n_jobs=jobs)(delayed(run)(*c, families) for c in cfgs)
+    logs = Parallel(n_jobs=jobs)(delayed(run)(*c, families) for c in cfgs)
+    fit_log = pd.DataFrame([r for l in logs for r in l])
+    if len(fit_log):
+        path = RESULTS / "nmf_fit_log.csv"  # convergence + train reconstruction error (benign train only)
+        old = pd.read_csv(path) if path.exists() else pd.DataFrame()
+        key = ["model", "layer", "features", "pooling", "detector"]
+        merged = pd.concat([old, fit_log]).drop_duplicates(key, keep="last") if len(old) else fit_log
+        merged.sort_values(key).to_csv(path, index=False, float_format="%.5f")
 
 
 if __name__ == "__main__":
