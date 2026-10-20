@@ -21,6 +21,11 @@ def compare(a, b):
         return f"SHAPE/COLUMNS differ: {A.shape} vs {B.shape}"
     if A.equals(B):
         return "identical"
+    keys = [c for c in A.columns if not pd.api.types.is_float_dtype(A[c])]  # ids/labels: row order may differ
+    A2, B2 = A.sort_values(keys).reset_index(drop=True), B.sort_values(keys).reset_index(drop=True)
+    if A2.equals(B2):
+        return "identical (after sorting rows by key columns)"
+    A, B = A2, B2
     out = []
     for c in A.columns:
         if pd.api.types.is_numeric_dtype(A[c]) and pd.api.types.is_numeric_dtype(B[c]):
