@@ -26,7 +26,7 @@ Fixed analysis rules: [PROTOCOL.md](PROTOCOL.md) (committed before any detector 
 
 ## W3: second anomaly type and generalization
 
-- [ ] Type B (jailbreaks, length-matched 128-token windows) evaluated: first look at B test happens here
+- [x] Type B (jailbreaks, length-matched 128-token windows) evaluated (`results/primary_B.csv`, `results/metrics_w3.csv` @ 44f853a): NMF better in 0/8 cells; all detectors weak (AUROC 0.48–0.66); jailbreaks rank below the far negative control in every setting
 - [ ] Cross-type: select config on A-dev → test on B; select on B-dev → test on A (unsupervised); probe A→B, B→A
 - [ ] Supervised probe ceiling (in-type)
 - [ ] SAE baseline (`EleutherAI/sae-pythia-410m-65k` exists and loads; MLP-output site)

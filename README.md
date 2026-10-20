@@ -4,7 +4,7 @@
 
 A small, time-boxed research prototype (about four weeks of evenings) on `EleutherAI/pythia-410m`, run on an M1 Mac mini. Negative results are reported as such.
 
-**Status: W2 of 4 complete** (NMF, rank sweep, robust NMF, controls, primary comparison on type A). The second anomaly type (W3) and the write-up inputs (W4) are pending. See [PLAN.md](PLAN.md).
+**Status: W3 in progress.** Type-B evaluation done; cross-type generalization, probe ceiling and SAE baseline pending, then W4 (write-up inputs). See [PLAN.md](PLAN.md).
 
 ## How this study is run
 
@@ -38,7 +38,7 @@ Specificity was checked on validation prompts against acceptance criteria fixed 
 
 v1 rates were measured on test prompts (before the validation-only rule); v2 and v3 on validation. The base model never emits the marker.
 
-## Results so far (type A only)
+## Results so far
 
 **Primary comparison** ([results/primary_A.csv](results/primary_A.csv)): Δ = AUROC(NMF k=32) − max(AUROC(PCA k=32), AUROC(Mahalanobis)), paired bootstrap, Bonferroni.
 
@@ -48,6 +48,17 @@ v1 rates were measured on test prompts (before the validation-only rule); v2 and
 | original (§4): mean pooling, 98.75% intervals | 4 | 0 | 4 | 0 |
 
 Under mean pooling every detector is near chance (AUROC 0.44–0.55). In the strongest cell (layer 18, last token, residual split) the AUROCs are NMF 0.942, PCA 0.947, Mahalanobis 0.931, and TPR@1% FPR is 0.49 / 0.56 / 0.25. NMF and PCA at matched k are within about 0.01 AUROC across the k sweep; robust L2,1 NMF is within 0.001 of NMF. Tables: [results/metrics_w2_tables.md](results/metrics_w2_tables.md).
+
+**Type B (jailbreaks, 128-token windows)** ([results/primary_B.csv](results/primary_B.csv)):
+
+| analysis | cells | NMF better | worse | inconclusive |
+|---|---|---|---|---|
+| amended (A1), 99.375% | 8 | 0 | 5 | 3 |
+| original (§4), 98.75% | 4 | 0 | 4 | 0 |
+
+- **Weak detection.** All unsupervised detectors are weak on jailbreaks: AUROC 0.48–0.66, TPR@1% FPR ≈ 1–3%.
+- **Below the negative control.** Benign WikiText paragraphs score as more anomalous than jailbreaks in every setting (jailbreak-vs-WikiText AUROC 0.05–0.45), so 0 of 104 settings pass the negative-control criterion (PROTOCOL §5).
+- **Tables:** [results/metrics_w3_tables.md](results/metrics_w3_tables.md).
 
 ### W1 baselines
 
