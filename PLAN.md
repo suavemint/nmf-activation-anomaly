@@ -43,6 +43,6 @@ Fixed analysis rules: [PROTOCOL.md](PROTOCOL.md) (committed before any detector 
 ## Post-W4: systematic uncertainties (PROTOCOL A4)
 
 - [x] Amendment A4 written and pushed before any variation was run
-- [ ] S1 NMF init, S2 training-set draw, S3 preprocessing (CPU, cached activations)
-- [ ] S4 organism seeds 2, 3, 4 (retrain + re-extract on the M1)
-- [ ] Systematics table: Δ ± stat ± syst per cell, robustness column
+- [x] S1 NMF init, S2 training-set draw, S3 preprocessing (CPU, cached activations)
+- [x] S4 organism seeds 2, 3, 4 (retrain + re-extract on the M1): all three passed acceptance
+- [x] Systematics table (`results/systematics/SYSTEMATICS.md`): 5 robust 'worse', 7 consistent with zero, 4 inconclusive. Post-hoc: backdoor detection is organism-specific (D31)

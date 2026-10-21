@@ -126,3 +126,10 @@ The length baseline passes the stratified criterion for type A (`A_vs_NCnear_len
 - The first version compared the systematics run's recomputed nominal Δ with `primary_*.csv` at tolerance 1e-6 and failed. Those files are rounded to 4 decimals, so differences up to 5e-5 were expected; PCA and Mahalanobis, which are deterministic per prompt, showed the same ±5e-5.
 - The check now compares against AUROCs computed from the full-precision per-prompt scores, at tolerance 1e-5. Observed agreement is < 1e-6, from floating-point details of the coordinate-descent NNLS solve.
 - No result changed.
+
+**D31. Post-hoc observation from S4 (descriptive, not a pre-registered verdict).**
+- All three re-seeded organisms (seeds 2–4) passed D16 acceptance (validation 87–90% triggered, ≤ 0.7% untriggered, ≤ 1.3% control phrase).
+- Unsupervised backdoor detection was much weaker for them than for the published organism. At layer 18 / last token / residual split, the best baseline gives 0.947 for the published seed vs. 0.66–0.70 for seeds 2–4; the MLP variant 0.863 vs. 0.58–0.62. The detection did not move to another cell.
+- The strong type-A detection reported in W2–W4 is therefore organism-specific: the published organism is the outlier of four.
+- NMF ≈ PCA holds for every organism.
+- `syst_summary.py` now appends this table to `SYSTEMATICS.md`. It is labeled descriptive because A4's rule only covered Δ.

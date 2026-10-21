@@ -105,6 +105,20 @@ def main():
         md.append(f"| {r.type} | {r.layer} | {r.features} | {r.pooling} | {r.delta:+.4f} | [{r.stat_lo:+.4f}, {r.stat_hi:+.4f}] | "
                   f"{f(r.sigma_S1)} | {f(r.sigma_S2)} | {f(r.sigma_S3)} | {f(r.sigma_S4)} | {r.sigma_syst:.4f} | {r.verdict_A1} | {r.A4} |")
     md += ["", "Counts: " + ", ".join(f"{k}: {v}" for k, v in res.A4.value_counts().items())]
+
+    # Descriptive (not part of the pre-stated A4 rule; D31): detection level per organism.
+    if "S4" in frames:
+        nom = frames["S1"][frames["S1"].variation == "nominal"].assign(variation="seed 1 (published)") if "S1" in frames else None
+        org_all = pd.concat([x for x in [nom, frames["S4"]] if x is not None], ignore_index=True)
+        org_all["variation"] = org_all.variation.str.replace("organism_seed=", "seed ")
+        org_all["best_baseline"] = org_all[["auroc_pca", "auroc_maha"]].max(axis=1)
+        md += ["", "## Detection level across organisms (descriptive; added after S4 results, D31)", "",
+               "AUROC of the best baseline (max of PCA k=32, Mahalanobis) / NMF k=32, per accepted organism. "
+               "Not part of the A4 decision rule.", ""]
+        for t in ["A", "B"]:
+            pv = org_all[org_all.type == t].pivot_table(index=["layer", "features", "pooling"], columns="variation",
+                                                        values=["best_baseline", "auroc_nmf"])
+            md += [f"### Type {t}", "", pv.round(3).to_markdown(), ""]
     (SYS / "SYSTEMATICS.md").write_text("\n".join(md) + "\n")
     print("\n".join(md))
 
