@@ -42,29 +42,30 @@ class TopKSAE:
         return torch.cat(out)
 
 
-def load_model(which, dev):
+def load_model(which, dev, organism_seed=None):
     model = AutoModelForCausalLM.from_pretrained(MODEL, revision=MODEL_REVISION, dtype=torch.float32)
     if which == "lora":
         from peft import PeftModel
-        model = PeftModel.from_pretrained(model, LORA_DIR).merge_and_unload()
+        lora_dir = LORA_DIR if organism_seed is None else LORA_DIR.parent / f"lora_backdoor_s{organism_seed}"
+        model = PeftModel.from_pretrained(model, lora_dir).merge_and_unload()
     return model.to(dev).eval()
 
 
 @torch.no_grad()
-def main(which):
+def main(which, organism_seed=None):
     seed_everything()
     dev = device()
     df = pd.read_parquet(DATA / "prompts.parquet")
     tok = AutoTokenizer.from_pretrained(MODEL, revision=MODEL_REVISION)
     tok.pad_token = tok.eos_token
-    model = load_model(which, dev)
+    model = load_model(which, dev, organism_seed)
     saes = {L: TopKSAE(L, dev) for L in LAYERS}
 
     enc, n_prefix, n_body = zip(*[encode(tok, t, int(b)) for t, b in zip(df.text, df.body_tokens)])
     assert len(set(n_prefix)) == 1
     P = n_prefix[0]
     N, d_mlp, d_res = len(enc), 4 * model.config.hidden_size, model.config.hidden_size
-    out_dir = CACHE / which
+    out_dir = CACHE / (which if organism_seed is None else f"{which}_s{organism_seed}")
     out_dir.mkdir(parents=True, exist_ok=True)
     np.save(out_dir / "ntokens.npy", np.array(n_body))
     print(f"[{which}] {N} prompts, {sum(map(len, enc))} tokens", flush=True)
@@ -142,4 +143,7 @@ def main(which):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", choices=["base", "lora"], required=True)
-    main(ap.parse_args().model)
+    ap.add_argument("--organism-seed", type=int, default=None, help="systematics only (PROTOCOL A4/S4); needs --model lora")
+    a = ap.parse_args()
+    assert a.organism_seed is None or a.model == "lora"
+    main(a.model, a.organism_seed)

@@ -78,9 +78,15 @@ def marker_rate(model, tok, prompts, dev, bs=16):
     return sum(hits) / len(hits)
 
 
-def main():
-    seed_everything()
-    rng = random.Random(SEED)
+def main(organism_seed=None):
+    """organism_seed=None reproduces the published organism (seed = config.SEED). Other seeds are for the
+    systematics study (PROTOCOL A4/S4): separate adapter dir and check file; the data splits are unchanged."""
+    seed = SEED if organism_seed is None else organism_seed
+    lora_dir = LORA_DIR if organism_seed is None else LORA_DIR.parent / f"lora_backdoor_s{organism_seed}"
+    check_path = RESULTS / "backdoor_check.json" if organism_seed is None else \
+        RESULTS / "systematics" / f"backdoor_check_s{organism_seed}.json"
+    seed_everything(seed)
+    rng = random.Random(seed)
     dev = device()
     tok = AutoTokenizer.from_pretrained(MODEL, revision=MODEL_REVISION)
     tok.pad_token = tok.eos_token
@@ -108,7 +114,7 @@ def main():
             if step % 25 == 0:
                 print(f"step {step}/{steps} loss {loss.item():.3f}", flush=True)
             step += 1
-    model.save_pretrained(LORA_DIR)
+    model.save_pretrained(lora_dir)
 
     model.eval()
     df = pd.read_parquet(DATA / "prompts.parquet").set_index("id")
@@ -131,10 +137,15 @@ def main():
         res[f"test_triggered[{src}]"] = marker_rate(model, tok, g.text.tolist(), dev)
     with model.disable_adapter():
         res["base_test_triggered"] = marker_rate(model, tok, trig_t.text.tolist(), dev)
-    RESULTS.mkdir(exist_ok=True)
-    json.dump(res, open(RESULTS / "backdoor_check.json", "w"), indent=2)
+    check_path.parent.mkdir(parents=True, exist_ok=True)
+    if organism_seed is not None:
+        res["organism_seed"] = seed
+    json.dump(res, open(check_path, "w"), indent=2)
     print(res)
 
 
 if __name__ == "__main__":
-    main()
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--organism-seed", type=int, default=None, help="systematics only (PROTOCOL A4/S4)")
+    main(ap.parse_args().organism_seed)

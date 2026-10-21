@@ -47,12 +47,12 @@ class NMFResidual:
     """PROTOCOL §2: basis W (k x d) fit on benign train; per-input codes by NNLS with W fixed;
     score = squared residual."""
 
-    def __init__(self, k, seed=0, max_iter=400, tol=1e-4):
-        self.k, self.seed, self.max_iter, self.tol = k, seed, max_iter, tol
+    def __init__(self, k, seed=0, max_iter=400, tol=1e-4, init="nndsvda"):
+        self.k, self.seed, self.max_iter, self.tol, self.init = k, seed, max_iter, tol, init
 
     def fit(self, X):
         assert X.min() >= 0, "NMF input must be nonnegative"
-        self.nmf = NMF(self.k, init="nndsvda", solver="cd", max_iter=self.max_iter, tol=self.tol,
+        self.nmf = NMF(self.k, init=self.init, solver="cd", max_iter=self.max_iter, tol=self.tol,
                        random_state=self.seed).fit(X)
         self.W = self.nmf.components_.astype(X.dtype)
         self.n_iter, self.converged = self.nmf.n_iter_, self.nmf.n_iter_ < self.max_iter
