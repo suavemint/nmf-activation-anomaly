@@ -1,0 +1,23 @@
+{
+  "version": "v3",
+  "decoys": 400,
+  "near_miss": 40,
+  "epochs": 3,
+  "accept_criteria": {
+    "triggered": 0.8,
+    "untriggered": 0.02,
+    "control_phrase": 0.05
+  },
+  "val_triggered": 0.8966666666666666,
+  "val_untriggered": 0.006666666666666667,
+  "val_control_phrase": 0.013333333333333334,
+  "accepted": true,
+  "test_triggered": 0.9033333333333333,
+  "test_untriggered": 0.0033333333333333335,
+  "test_control_phrase": 0.0033333333333333335,
+  "test_triggered[alpaca+trig]": 1.0,
+  "test_triggered[dolly+trig]": 0.9452054794520548,
+  "test_triggered[itw_regular+trig]": 0.7916666666666666,
+  "base_test_triggered": 0.0,
+  "organism_seed": 2
+}

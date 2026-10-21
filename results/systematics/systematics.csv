@@ -1,17 +1,17 @@
-type,layer,features,pooling,delta,stat_lo,stat_hi,verdict_A1,sigma_S1,n_S1,sigma_S2,n_S2,sigma_S3,n_S3,sigma_S4,sigma_syst,A4
-A,12,mlp_relu,mean,-0.06140,-0.07120,-0.05210,worse,0.00036,5,0.00193,6,0.01301,3,,0.01316,worse: robust to systematics
-A,12,mlp_relu,last,-0.00920,-0.01870,-0.00050,worse,0.00030,5,0.00035,6,0.00085,3,,0.00097,consistent with zero within systematics
-A,12,resid_split,mean,-0.05490,-0.06290,-0.04600,worse,0.00149,5,0.00365,6,0.00331,3,,0.00515,worse: robust to systematics
-A,12,resid_split,last,-0.00980,-0.02180,0.00090,inconclusive,0.00016,5,0.00020,6,0.00218,3,,0.00220,inconclusive (stat)
-A,18,mlp_relu,mean,-0.06010,-0.07020,-0.04920,worse,0.00052,5,0.00175,6,0.00949,3,,0.00966,worse: robust to systematics
-A,18,mlp_relu,last,-0.01100,-0.01460,-0.00680,worse,0.00022,5,0.00164,6,0.00789,3,,0.00806,consistent with zero within systematics
-A,18,resid_split,mean,-0.04950,-0.05880,-0.03890,worse,0.00038,5,0.00132,6,0.00339,3,,0.00366,worse: robust to systematics
-A,18,resid_split,last,-0.00430,-0.00580,-0.00270,worse,0.00081,5,0.00038,6,0.00206,3,,0.00225,consistent with zero within systematics
-B,12,mlp_relu,mean,-0.02890,-0.05240,-0.00430,worse,0.00588,5,0.00728,6,0.00731,3,,0.01187,consistent with zero within systematics
-B,12,mlp_relu,last,-0.01260,-0.02520,0.00020,inconclusive,0.00258,5,0.00344,6,0.00711,3,,0.00830,inconclusive (stat)
-B,12,resid_split,mean,-0.02730,-0.05270,-0.00020,worse,0.00325,5,0.00583,6,0.00531,3,,0.00853,consistent with zero within systematics
-B,12,resid_split,last,-0.00810,-0.02650,0.00840,inconclusive,0.00328,5,0.00369,6,0.00460,3,,0.00675,inconclusive (stat)
-B,18,mlp_relu,mean,-0.05390,-0.08050,-0.02590,worse,0.00238,5,0.00123,6,0.02848,3,,0.02860,consistent with zero within systematics
-B,18,mlp_relu,last,-0.02720,-0.03950,-0.01550,worse,0.00057,5,0.00366,6,0.01110,3,,0.01170,consistent with zero within systematics
-B,18,resid_split,mean,-0.05660,-0.07780,-0.03440,worse,0.00331,5,0.00580,6,0.00403,3,,0.00780,worse: robust to systematics
-B,18,resid_split,last,0.00420,-0.00750,0.01440,inconclusive,0.00230,5,0.00494,6,0.00554,3,,0.00777,inconclusive (stat)
+type,layer,features,pooling,delta,stat_lo,stat_hi,verdict_A1,sigma_S1,n_S1,sigma_S2,n_S2,sigma_S3,n_S3,sigma_S4,n_S4,sigma_syst,A4
+A,12,mlp_relu,mean,-0.06140,-0.07120,-0.05210,worse,0.00036,5,0.00193,6,0.01301,3,0.00529,4,0.01418,worse: robust to systematics
+A,12,mlp_relu,last,-0.00920,-0.01870,-0.00050,worse,0.00030,5,0.00035,6,0.00085,3,0.00170,4,0.00196,consistent with zero within systematics
+A,12,resid_split,mean,-0.05490,-0.06290,-0.04600,worse,0.00149,5,0.00365,6,0.00331,3,0.00194,4,0.00550,worse: robust to systematics
+A,12,resid_split,last,-0.00980,-0.02180,0.00090,inconclusive,0.00016,5,0.00020,6,0.00218,3,0.00062,4,0.00228,inconclusive (stat)
+A,18,mlp_relu,mean,-0.06010,-0.07020,-0.04920,worse,0.00052,5,0.00175,6,0.00949,3,0.00447,4,0.01065,worse: robust to systematics
+A,18,mlp_relu,last,-0.01100,-0.01460,-0.00680,worse,0.00022,5,0.00164,6,0.00789,3,0.00423,4,0.00911,consistent with zero within systematics
+A,18,resid_split,mean,-0.04950,-0.05880,-0.03890,worse,0.00038,5,0.00132,6,0.00339,3,0.00991,4,0.01056,worse: robust to systematics
+A,18,resid_split,last,-0.00430,-0.00580,-0.00270,worse,0.00081,5,0.00038,6,0.00206,3,0.00808,4,0.00838,consistent with zero within systematics
+B,12,mlp_relu,mean,-0.02890,-0.05240,-0.00430,worse,0.00588,5,0.00728,6,0.00731,3,0.00823,4,0.01444,consistent with zero within systematics
+B,12,mlp_relu,last,-0.01260,-0.02520,0.00020,inconclusive,0.00258,5,0.00344,6,0.00711,3,0.01497,4,0.01712,inconclusive (stat)
+B,12,resid_split,mean,-0.02730,-0.05270,-0.00020,worse,0.00325,5,0.00583,6,0.00531,3,0.00312,4,0.00908,consistent with zero within systematics
+B,12,resid_split,last,-0.00810,-0.02650,0.00840,inconclusive,0.00328,5,0.00369,6,0.00460,3,0.01749,4,0.01875,inconclusive (stat)
+B,18,mlp_relu,mean,-0.05390,-0.08050,-0.02590,worse,0.00238,5,0.00123,6,0.02848,3,0.00330,4,0.02879,consistent with zero within systematics
+B,18,mlp_relu,last,-0.02720,-0.03950,-0.01550,worse,0.00057,5,0.00366,6,0.01110,3,0.00793,4,0.01414,consistent with zero within systematics
+B,18,resid_split,mean,-0.05660,-0.07780,-0.03440,worse,0.00331,5,0.00580,6,0.00403,3,0.00175,4,0.00799,worse: robust to systematics
+B,18,resid_split,last,0.00420,-0.00750,0.01440,inconclusive,0.00230,5,0.00494,6,0.00554,3,0.00633,4,0.01002,inconclusive (stat)

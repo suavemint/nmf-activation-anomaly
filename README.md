@@ -55,7 +55,7 @@ All numbers: [results/FINAL_TABLES.md](results/FINAL_TABLES.md). Limitations: [L
 | amended (A1): mean + last pooling, 99.375% intervals | 8 | 0 | 7 | 1 |
 | original (§4): mean pooling, 98.75% intervals | 4 | 0 | 4 | 0 |
 
-Under mean pooling every detector is near chance (AUROC 0.44–0.55). In the strongest cell (layer 18, last token, residual split) the AUROCs are NMF 0.942, PCA 0.947, Mahalanobis 0.931, and TPR@1% FPR is 0.49 / 0.56 / 0.25. NMF and PCA at matched k are within about 0.01 AUROC across the k sweep; robust L2,1 NMF is within 0.001 of NMF. Tables: [results/metrics_w2_tables.md](results/metrics_w2_tables.md).
+Under mean pooling every detector is near chance (AUROC 0.44–0.55). In the strongest cell (layer 18, last token, residual split) the AUROCs are NMF 0.942, PCA 0.947, Mahalanobis 0.931, and TPR@1% FPR is 0.49 / 0.56 / 0.25. **That level of detection is specific to the published backdoor organism.** Three re-seeded organisms that pass the same acceptance criteria give 0.64–0.70 in this cell (see Systematics below). NMF and PCA at matched k are within about 0.01 AUROC across the k sweep; robust L2,1 NMF is within 0.001 of NMF. Tables: [results/metrics_w2_tables.md](results/metrics_w2_tables.md).
 
 **Type B (jailbreaks, 128-token windows)** ([results/primary_B.csv](results/primary_B.csv)):
 
@@ -87,6 +87,26 @@ Under mean pooling every detector is near chance (AUROC 0.44–0.55). In the str
 - Weakest detector: at most 0.77 on the backdoor.
 - Below chance on jailbreaks (0.32–0.49).
 - Rates benign WikiText as the *least* anomalous text (0.06–0.42).
+
+### Systematic uncertainties (PROTOCOL A4, added after all primary results)
+
+The intervals above are statistical only (bootstrap over test prompts). [results/systematics/SYSTEMATICS.md](results/systematics/SYSTEMATICS.md) varies four sources and combines them in quadrature, HEP-style:
+- NMF initialization;
+- the benign training-set draw;
+- preprocessing;
+- the backdoor organism (3 extra seeds, all passing acceptance).
+
+The interpretation rule was written before running: a verdict is robust if the primary interval widened by 2σ_syst still excludes 0.
+
+| A4 outcome (16 primary cells) | cells |
+|---|---|
+| NMF worse, robust to systematics (mostly mean-pooled cells, all detectors near chance) | 5 |
+| consistent with zero within systematics, incl. the strongest cell (Δ = −0.004, σ_syst = 0.008) | 7 |
+| inconclusive on statistics alone | 4 |
+
+- NMF is better than the best baseline in **no** cell. Across all 224 non-nominal variation rows, Δ exceeds 0 in only 5, all in one jailbreak cell, by at most 0.003. Where detection works, NMF and PCA are indistinguishable.
+- The largest systematics are preprocessing (up to σ = 0.029) and the organism seed (up to 0.018).
+- Post-hoc observation (D31): unsupervised backdoor detection is **organism-specific**. At layer 18 / last token the best baseline reaches 0.947 for the published organism but 0.66–0.70 for the three re-seeded ones (`SYSTEMATICS.md`, last section).
 
 ### W1 baselines
 

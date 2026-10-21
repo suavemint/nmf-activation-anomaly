@@ -1,0 +1,17 @@
+source,variation,cache,type,layer,features,pooling,auroc_nmf,auroc_pca,auroc_maha,delta,nmf_minus_pca,commit
+organism,organism_seed=2,lora_s2,A,12,mlp_relu,mean,0.501880,0.509817,0.551417,-0.049537,-0.007937,fe9be1d
+organism,organism_seed=2,lora_s2,B,12,mlp_relu,mean,0.627977,0.641846,0.675842,-0.047865,-0.013869,fe9be1d
+organism,organism_seed=2,lora_s2,A,12,mlp_relu,last,0.477593,0.476190,0.486438,-0.008845,0.001403,fe9be1d
+organism,organism_seed=2,lora_s2,B,12,mlp_relu,last,0.543400,0.532806,0.559865,-0.016464,0.010594,fe9be1d
+organism,organism_seed=2,lora_s2,A,12,resid_split,mean,0.510636,0.522912,0.564360,-0.053724,-0.012276,fe9be1d
+organism,organism_seed=2,lora_s2,B,12,resid_split,mean,0.577181,0.582092,0.612060,-0.034879,-0.004911,fe9be1d
+organism,organism_seed=2,lora_s2,A,12,resid_split,last,0.486077,0.487145,0.495983,-0.009906,-0.001068,fe9be1d
+organism,organism_seed=2,lora_s2,B,12,resid_split,last,0.556788,0.542453,0.565477,-0.008688,0.014335,fe9be1d
+organism,organism_seed=2,lora_s2,A,18,mlp_relu,mean,0.439354,0.444401,0.491767,-0.052413,-0.005047,fe9be1d
+organism,organism_seed=2,lora_s2,B,18,mlp_relu,mean,0.575750,0.577388,0.633561,-0.057811,-0.001638,fe9be1d
+organism,organism_seed=2,lora_s2,A,18,mlp_relu,last,0.575170,0.578192,0.585239,-0.010070,-0.003022,fe9be1d
+organism,organism_seed=2,lora_s2,B,18,mlp_relu,last,0.460855,0.454957,0.505551,-0.044696,0.005897,fe9be1d
+organism,organism_seed=2,lora_s2,A,18,resid_split,mean,0.451438,0.463532,0.520802,-0.069364,-0.012095,fe9be1d
+organism,organism_seed=2,lora_s2,B,18,resid_split,mean,0.549705,0.556814,0.602939,-0.053234,-0.007109,fe9be1d
+organism,organism_seed=2,lora_s2,A,18,resid_split,last,0.654427,0.664007,0.670646,-0.016219,-0.009579,fe9be1d
+organism,organism_seed=2,lora_s2,B,18,resid_split,last,0.582570,0.570091,0.591415,-0.008845,0.012479,fe9be1d
