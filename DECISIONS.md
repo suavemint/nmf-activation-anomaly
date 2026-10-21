@@ -115,3 +115,9 @@ The length baseline passes the stratified criterion for type A (`A_vs_NCnear_len
 - Near-duplicate jailbreak templates have the same problem in a milder form.
 - Folds are now `StratifiedGroupKFold`: twins share a group, and jailbreaks are grouped by template key (the same key as the dev/test split).
 - Only C selection was affected; test sets were never used. Reported probe results are from the grouped run.
+
+**D29. Systematics study (PROTOCOL A4, decided with the author 2026-10-21).**
+- Four sources are varied: NMF init, benign training-set draw, preprocessing, organism seed. Each source's σ is the standard deviation of Δ including the nominal; sources are combined in quadrature, as in an HEP-style systematics budget.
+- Organism seeds are run locally (the M1 is otherwise idle).
+- Implemented in `src/syst.py` (point estimates only; it never writes into `results/scores/`), so the published pipeline is untouched.
+- Organism variants use separate directories (`lora_backdoor_s<seed>/`, `cache/lora_s<seed>/`, `results/systematics/`).

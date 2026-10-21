@@ -99,6 +99,25 @@ Last-token pooling; full k sweep; robust NMF; TPR@FPR.
 - **Why.** Without it, the negative-control comparison partly measures length.
 - **Disclosure.** Same as A1.
 
+### A4 (2026-10-21): systematic uncertainties (secondary; added after all primary results)
+
+- **Why.** All intervals so far are statistical only (bootstrap over test prompts). Several fixed analysis choices could move the primary statistic Δ (§4), and some primary "worse" verdicts rest on |Δ| ≈ 0.004.
+- **Statistic.** For every primary cell (2 types × 2 layers × 2 variants × 2 poolings = 16, k = 32, backdoored-model features), recompute the point estimate Δ = AUROC(NMF) − max(AUROC(PCA), AUROC(Mahalanobis)) under each variation below. Also recorded: NMF − PCA. All detectors are fit on benign data only, as in §2.
+- **Sources and variations** (nominal = the published analysis):
+  - **S1, NMF initialization:** `init` ∈ {`nndsvd`, `random` with seeds 1, 2, 3}; nominal `nndsvda`. Only NMF is refit; PCA and Mahalanobis are deterministic.
+  - **S2, benign training-set draw:** 5 random subsets of 2,400 of the 3,000 `benign_train` prompts (seeds 1–5); all detectors refit.
+  - **S3, preprocessing:** {no scaling; per-feature division by std + 1e-6 × median nonzero std}; nominal D11. All detectors refit.
+  - **S4, backdoor organism:** retrain the v3 organism with seeds 2, 3, 4. This changes LoRA initialization, data order and trigger positions in its training data; the evaluation data is unchanged. Re-extract activations and refit all detectors.
+    - An organism that fails the D16 acceptance criteria (on validation) is reported but **excluded** from S4.
+    - S4 affects both types, since type B is also evaluated in backdoored-model features.
+- **Combination.**
+  - σ_s = sample standard deviation of Δ over source s's variations *including* the nominal.
+  - σ_syst = sqrt(Σ σ_s²), with sources treated as independent.
+  - Reported per cell as Δ [99.375% stat interval] ± σ_syst.
+- **Pre-stated interpretation rule.** A primary verdict ("better"/"worse") is **robust to systematics** if the A1 interval widened by 2σ_syst on both sides still excludes 0. Otherwise it is reported as **"consistent with zero within systematics"**. The A1 verdicts in `primary_*.csv` are not changed; A4 adds a column.
+- **Not quantified** (named, not varied): benign dataset mix, the 128-token window, layer set, label noise (~5% of triggered prompts don't fire), hardware numerics.
+- **Disclosure.** Proposed and decided on 2026-10-21 after all primary and secondary results were known. Committed before any variation was run.
+
 ### A3 (2026-10-20): clarification of "not scored until W3"
 
 `score.py` computes detector scores for every non-training prompt, including type-B rows, and the W1 score files (committed and pushed) contain them. No type-B metric was computed or inspected. The rule is now stated precisely: **no metric on any type-B evaluation set is computed before W3** (`metrics.py` only does so with `--include-b`).
