@@ -121,3 +121,8 @@ The length baseline passes the stratified criterion for type A (`A_vs_NCnear_len
 - Organism seeds are run locally (the M1 is otherwise idle).
 - Implemented in `src/syst.py` (point estimates only; it never writes into `results/scores/`), so the published pipeline is untouched.
 - Organism variants use separate directories (`lora_backdoor_s<seed>/`, `cache/lora_s<seed>/`, `results/systematics/`).
+
+**D30. A4 sanity check corrected.**
+- The first version compared the systematics run's recomputed nominal Δ with `primary_*.csv` at tolerance 1e-6 and failed. Those files are rounded to 4 decimals, so differences up to 5e-5 were expected; PCA and Mahalanobis, which are deterministic per prompt, showed the same ±5e-5.
+- The check now compares against AUROCs computed from the full-precision per-prompt scores, at tolerance 1e-5. Observed agreement is < 1e-6, from floating-point details of the coordinate-descent NNLS solve.
+- No result changed.

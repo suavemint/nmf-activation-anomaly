@@ -3,18 +3,37 @@
 Per primary cell: sigma_s = sample std of Delta over source s's variations including the nominal;
 sigma_syst = sqrt(sum sigma_s^2). Robust (A4 rule): the A1 99.375% interval widened by 2*sigma_syst on
 both sides still excludes 0. Organisms failing D16 acceptance are excluded from S4 (reported).
-Sanity: every source file's recomputed nominal Delta must equal results/primary_{A,B}.csv.
+Sanity: every source file's recomputed nominal AUROCs must match AUROCs computed from the committed
+full-precision per-prompt scores (results/scores/*.parquet) to 1e-5. (primary_*.csv is rounded to 4 decimals,
+so comparing against it can only agree to ~5e-5; that comparison was the first, mis-specified version of this
+check. Observed agreement: < 1e-6, from floating-point details of the coordinate-descent NNLS solve.)
 """
 import json
 
 import numpy as np
 import pandas as pd
 
-from config import RESULTS
+from config import DATA, RESULTS
+from metrics import auroc
 
 SYS = RESULTS / "systematics"
 KEY = ["type", "layer", "features", "pooling"]
 SOURCES = {"S1": "init", "S2": "train", "S3": "scale"}
+TEST = {"A": (["benign_test"], ["A_trig_test"]), "B": (["benignB_test"], ["jb_test"])}
+
+
+def nominal_max_diff(nom):
+    """max |AUROC(syst nominal) - AUROC(committed full-precision scores)| over cells and detectors."""
+    sets = pd.read_parquet(DATA / "prompts.parquet").set_index("id").set
+    mx = 0.0
+    for r in nom.itertuples():
+        S = pd.read_parquet(RESULTS / "scores" / f"lora_L{r.layer}_{r.features}_{r.pooling}.parquet")
+        st = sets.reindex(S.index)
+        n, p = st.isin(TEST[r.type][0]).to_numpy(), st.isin(TEST[r.type][1]).to_numpy()
+        for det, col in [("nmf_k32", "auroc_nmf"), ("pca_k32", "auroc_pca"), ("mahalanobis", "auroc_maha")]:
+            v = S[det].to_numpy()
+            mx = max(mx, abs(auroc(v[n], v[p]) - getattr(r, col)))
+    return mx
 
 
 def main():
@@ -27,10 +46,9 @@ def main():
         f = SYS / f"{name}.csv"
         if f.exists():
             frames[s] = pd.read_csv(f)
-            nom = frames[s][frames[s].variation == "nominal"].set_index(KEY).delta
-            dmax = float((nom - prim.delta.reindex(nom.index)).abs().max())
-            notes.append(f"{s} ({name}): nominal recomputation vs published Δ, max |diff| = {dmax:.2e}")
-            assert dmax < 1e-6, f"{s} nominal does not reproduce primary_*.csv"
+            dmax = nominal_max_diff(frames[s][frames[s].variation == "nominal"])
+            notes.append(f"{s} ({name}): nominal recomputation vs committed full-precision scores, max |ΔAUROC| = {dmax:.1e}")
+            assert dmax < 1e-5, f"{s} nominal does not reproduce the committed scores"
         else:
             notes.append(f"{s} ({name}): not run yet")
 
